@@ -1,0 +1,9 @@
+node_modules
+build
+.vscode
+.env
+.eslintcache
+yarn-error.log
+.docker-secret*
+**.DS_Store
+lerna-debug.log
