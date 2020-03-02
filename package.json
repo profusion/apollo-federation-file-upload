@@ -1,5 +1,5 @@
 {
-  "name": "apollo-federation-upload",
+  "name": "@profusion/apollo-federation-upload",
   "version": "1.0.0",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
