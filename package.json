@@ -12,7 +12,8 @@
     "lint": "run-s check-types run-lint",
     "install-peers": "install-peers -f",
     "build": "tsc",
-    "prepublishOnly": "tsc"
+    "prepublishOnly": "tsc",
+    "test": "echo 'TODO: no tests yet'"
   },
   "dependencies": {
     "form-data": "^3.0.0",
@@ -27,8 +28,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn lint",
-      "pre-push": "yarn lint",
+      "pre-commit": "yarn lint && yarn test --coverage",
+      "pre-push": "yarn lint && yarn test --coverage",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
