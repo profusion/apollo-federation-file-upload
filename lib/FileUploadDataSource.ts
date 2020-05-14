@@ -14,7 +14,7 @@ type Variables = object | null;
 
 interface DataSourceArgs {
   request: GraphQLRequestContext['request'];
-  context: unknown;
+  context: GraphQLRequestContext['context'];
 }
 
 export default class FileUploadDataSource extends RemoteGraphQLDataSource {
@@ -133,7 +133,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
     try {
       const httpResponse = await fetch(httpRequest);
 
-      const body = await this.didReceiveResponse(httpResponse, httpRequest);
+      const body = await this.parseBody(httpResponse);
 
       if (!isObject(body)) {
         throw new Error(`Expected JSON response body, but received: ${body}`);
