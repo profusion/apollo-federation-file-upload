@@ -58,7 +58,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
     args: DataSourceArgs,
     fileVariables: FileVariablesTuple[],
   ): Promise<GraphQLResponse> {
-    const { request } = args;
+    const { context, request } = args;
     const form = new FormData();
 
     const variables = cloneDeep(request.variables || {});
@@ -118,6 +118,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
       method: 'POST',
       url: this.url,
     };
+
     if (this.willSendRequest) {
       await this.willSendRequest(args);
     }
@@ -142,6 +143,10 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
         ...body,
         http: httpResponse,
       };
+
+      if (typeof this.didReceiveResponse === 'function') {
+        return this.didReceiveResponse({ context, request, response });
+      }
 
       return response;
     } catch (error) {
