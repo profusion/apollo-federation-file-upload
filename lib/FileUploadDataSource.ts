@@ -34,7 +34,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
             return acc;
           }
           if (isObject(value)) {
-            return extract(value, name);
+            return extract(value, key);
           }
           return acc;
         },
