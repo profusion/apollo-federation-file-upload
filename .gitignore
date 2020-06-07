@@ -7,3 +7,4 @@ yarn-error.log
 .docker-secret*
 **.DS_Store
 lerna-debug.log
+.nyc_output
