@@ -1,0 +1,200 @@
+{
+	"info": {
+		"_postman_id": "ed0319d0-4237-491e-bb06-845939f0b211",
+		"name": "collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SimpleUpload",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "03165713-3dd0-478a-8e05-3396abc4cff6",
+						"exec": [
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.simpleUpload).to.deep.equal({",
+							"        'filename': 'upload1.txt',",
+							"        'mimetype': 'text/plain',",
+							"        'encoding': '7bit',",
+							"        'content': 'upload1\\n',",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{ \"query\": \"mutation SingleUpload($f: Upload!) {simpleUpload(f: $f) {filename,mimetype,encoding,content}}\", \"variables\": {\"f\": null}}",
+							"type": "text"
+						},
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.f\"]}",
+							"type": "text"
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload1.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "InputUpload",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0c5c948e-e67d-4ada-95b5-d5da27322dc3",
+						"exec": [
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.simpleInput).to.deep.equal({",
+							"        'filename': 'upload2.txt',",
+							"        'mimetype': 'text/plain',",
+							"        'encoding': '7bit',",
+							"        'content': 'upload2\\n',",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{\"query\": \"mutation SimpleInputMutation($input: SimpleInput!) {simpleInput(input: $input) {filename,mimetype,encoding,content}}\", \"variables\": {\"input\": {\"str\": \"a string\", \"f\": null}}}",
+							"type": "text"
+						},
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.input.f\"]}",
+							"type": "text"
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload2.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NestedInputUpload",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3c3778d6-a4b6-4fd1-bba8-0a97a194fea3",
+						"exec": [
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.nestedInput).to.deep.equal({",
+							"        'filename': 'upload3.txt',",
+							"        'mimetype': 'text/plain',",
+							"        'encoding': '7bit',",
+							"        'content': 'upload3\\n',",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{\"query\": \"mutation NestedInputMutation($input: NestedInput!) {nestedInput(input: $input) {filename,mimetype,encoding,content}}\", \"variables\": {\"input\": {\"str\": \"a string\", \"nested\": {\"str\": \"another str\", \"f\": null}}}}",
+							"type": "text"
+						},
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.input.nested.f\"]}",
+							"type": "text"
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload3.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "215009de-1ecb-4074-a5ae-ec64c509f97e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "5232172b-5acf-48ef-993a-850b2bf10deb",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
