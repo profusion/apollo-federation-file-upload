@@ -1,6 +1,6 @@
 import { RemoteGraphQLDataSource } from '@apollo/gateway';
 import { GraphQLResponse, GraphQLRequestContext } from 'apollo-server-types';
-import { fetch, Request, Headers } from 'apollo-server-env';
+import { Request, Headers } from 'apollo-server-env';
 import { FileUpload } from 'graphql-upload';
 import { isObject } from '@apollo/gateway/dist/utilities/predicates';
 import cloneDeep from 'lodash.clonedeep';
@@ -132,7 +132,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
     const httpRequest = new Request(request.http.url, options);
 
     try {
-      const httpResponse = await fetch(httpRequest);
+      const httpResponse = await this.fetcher(httpRequest);
 
       const body = await this.parseBody(httpResponse);
 
