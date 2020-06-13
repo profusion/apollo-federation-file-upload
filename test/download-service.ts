@@ -25,10 +25,20 @@ const typeDefs = gql`
     nested: SimpleInput!
   }
 
+  input InputWithUploadArray {
+    str: String!
+    files: [Upload!]!
+  }
+
   extend type Mutation {
     simpleUpload(f: Upload!): File!
     simpleInput(input: SimpleInput!): File!
     nestedInput(input: NestedInput!): File!
+    simpleUploadArray(arr: [Upload!]!, arr2: [Int!]!): [File!]!
+    inputWithUploadArray(
+      input: InputWithUploadArray!
+      input2: [NestedInput!]!
+    ): [File!]!
   }
 
   extend type Query {
@@ -64,6 +74,20 @@ const processUpload = async (f: Promise<FileUpload>): Promise<File> => {
 
 const resolvers: GraphQLResolverMap<unknown> = {
   Mutation: {
+    inputWithUploadArray: (
+      _: unknown,
+      { input: { files }, input2 },
+    ): Promise<File[]> =>
+      Promise.all([
+        ...files.map(processUpload),
+        ...input2.map(
+          ({
+            nested: { f },
+          }: {
+            nested: { f: Promise<FileUpload> };
+          }): Promise<File> => processUpload(f),
+        ),
+      ]),
     nestedInput: (
       _: unknown,
       {
@@ -75,6 +99,8 @@ const resolvers: GraphQLResolverMap<unknown> = {
     simpleInput: (_: unknown, { input: { f } }): Promise<File> =>
       processUpload(f),
     simpleUpload: (_: unknown, { f }): Promise<File> => processUpload(f),
+    simpleUploadArray: (_: unknown, { arr }): Promise<File[]> =>
+      Promise.all(arr.map(processUpload)),
   },
   Query: {
     // This is needed, so the gateway won't complain that a Query is missing

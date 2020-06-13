@@ -172,6 +172,149 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "SimpleUploadArray",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "885e52a7-6ec2-442a-b4ce-c0d954871519",
+						"exec": [
+							"pm.test('results', function() {",
+              "    var resp = pm.response.json();",
+              "    pm.expect(resp.data.simpleUploadArray.length).to.equal(3)",
+              "    resp.data.simpleUploadArray.forEach(function(e, idx) {",
+              "       pm.expect(e).to.deep.equal({",
+              "           'filename': 'upload' + (idx + 1) + '.txt',",
+              "           'mimetype': 'text/plain',",
+              "           'encoding': '7bit',",
+              "           'content': 'upload' + (idx + 1) + '\\n',",
+              "       });",
+              "    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{\"query\": \"mutation SimpleUploadArray($arr: [Upload!]!, $arr2: [Int!]!) {simpleUploadArray(arr: $arr, arr2: $arr2) {filename,mimetype,encoding,content}}\", \"variables\": {\"arr\": [], \"arr2\": [1,2,3,4]}}",
+							"type": "text"
+						},
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.arr.0\"], \"1\": [\"variables.arr.1\"], \"2\": [\"variables.arr.2\"]}",
+							"type": "text"
+            },
+            {
+              "key": "0",
+              "type": "file",
+              "src": "./test/upload1.txt"
+            },
+            {
+							"key": "1",
+							"type": "file",
+							"src": "./test/upload2.txt"
+						},
+						{
+							"key": "2",
+							"type": "file",
+							"src": "./test/upload3.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "InputWithUploadArray",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8ed6bfe9-323f-40bf-a90f-35b3c90dcfef",
+						"exec": [
+              "pm.test('results', function() {",
+              "    var resp = pm.response.json();",
+              "    pm.expect(resp.data.inputWithUploadArray.length).to.equal(4)",
+              "    resp.data.inputWithUploadArray.forEach(function(e, idx) {",
+              "       pm.expect(e).to.deep.equal({",
+              "           'filename': 'upload' + (idx + 1) + '.txt',",
+              "           'mimetype': 'text/plain',",
+              "           'encoding': '7bit',",
+              "           'content': 'upload' + (idx + 1) + '\\n',",
+              "       });",
+              "    });",
+              "});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{\"query\": \"mutation InputWithUploadArray($input: InputWithUploadArray!, $input2: [NestedInput!]!) {inputWithUploadArray(input: $input, input2: $input2) {filename,mimetype,encoding,content}}\", \"variables\": {\"input2\": [{\"str\": \"str\", \"nested\": {\"str\": \"nested str\"}}], \"input\": {\"str\": \"a string\"}}}",
+							"type": "text"
+						},
+            {
+              "key": "map",
+              "value": "{\"0\": [\"variables.input.files.0\"], \"1\": [\"variables.input.files.1\"], \"2\": [\"variables.input.files.2\"], \"3\": [\"variables.input2.0.nested.f\"]}",
+              "type": "text"
+            },
+            {
+              "key": "0",
+              "type": "file",
+              "src": "./test/upload1.txt"
+            },
+            {
+              "key": "1",
+              "type": "file",
+              "src": "./test/upload2.txt"
+            },
+            {
+              "key": "2",
+              "type": "file",
+              "src": "./test/upload3.txt"
+            },
+            {
+              "key": "3",
+              "type": "file",
+              "src": "./test/upload4.txt"
+            }
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [

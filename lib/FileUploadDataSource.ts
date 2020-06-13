@@ -33,8 +33,30 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
             acc.push([key, value]);
             return acc;
           }
+          if (Array.isArray(value)) {
+            const [first] = value;
+            if (first instanceof Promise) {
+              return acc.concat(
+                value.map(
+                  (v: Promise<FileUpload>, idx: number): FileVariablesTuple => [
+                    `${key}.${idx}`,
+                    v,
+                  ],
+                ),
+              );
+            }
+            if (isObject(first)) {
+              return acc.concat(
+                ...value.map(
+                  (v: Promise<FileUpload>, idx: number): FileVariablesTuple[] =>
+                    extract(v, `${key}.${idx}`),
+                ),
+              );
+            }
+            return acc;
+          }
           if (isObject(value)) {
-            return extract(value, key);
+            return acc.concat(extract(value, key));
           }
           return acc;
         },
