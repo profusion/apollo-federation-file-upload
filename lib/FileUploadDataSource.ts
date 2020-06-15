@@ -10,7 +10,7 @@ import FormData from './FormData';
 
 type FileVariablesTuple = [string, Promise<FileUpload>];
 
-type Variables = object | null;
+type Variables = Record<string, unknown> | null;
 
 interface DataSourceArgs {
   request: GraphQLRequestContext['request'];
@@ -48,7 +48,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
             if (isObject(first)) {
               return acc.concat(
                 ...value.map(
-                  (v: Promise<FileUpload>, idx: number): FileVariablesTuple[] =>
+                  (v: Variables, idx: number): FileVariablesTuple[] =>
                     extract(v, `${key}.${idx}`),
                 ),
               );
@@ -56,7 +56,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
             return acc;
           }
           if (isObject(value)) {
-            return acc.concat(extract(value, key));
+            return acc.concat(extract(value as Variables, key));
           }
           return acc;
         },
