@@ -12,10 +12,76 @@ type FileVariablesTuple = [string, Promise<FileUpload>];
 
 type Variables = Record<string, unknown> | null;
 
+type ConstructorArgs = Exclude<
+  ConstructorParameters<typeof RemoteGraphQLDataSource>[0],
+  undefined
+>;
+
+export type FileUploadDataSourceArgs = ConstructorArgs & {
+  useChunkedTransfer?: boolean;
+};
+
 interface DataSourceArgs {
   request: GraphQLRequestContext['request'];
   context: GraphQLRequestContext['context'];
 }
+
+type AddDataHandler = (
+  form: FormData,
+  resolvedFiles: FileUpload[],
+) => Promise<void | void[]>;
+
+const addChunkedDataToForm: AddDataHandler = (
+  form: FormData,
+  resolvedFiles: FileUpload[],
+): Promise<void> => {
+  resolvedFiles.forEach(
+    ({ createReadStream, filename, mimetype: contentType }, i: number) => {
+      form.append(i.toString(), createReadStream(), {
+        contentType,
+        filename,
+        /*
+          Set knownLength to NaN so node-fetch does not set the
+          Content-Length header and properly set the enconding
+          to chunked.
+          https://github.com/form-data/form-data/pull/397#issuecomment-471976669
+        */
+        knownLength: Number.NaN,
+      });
+    },
+  );
+  return Promise.resolve();
+};
+
+const addDataToForm: AddDataHandler = (
+  form: FormData,
+  resolvedFiles: FileUpload[],
+): Promise<void[]> =>
+  Promise.all(
+    resolvedFiles.map(
+      async (
+        { createReadStream, filename, mimetype: contentType },
+        i: number,
+      ): Promise<void> => {
+        const fileData = await new Promise<Buffer>((resolve, reject) => {
+          const stream = createReadStream();
+          const buffers: Buffer[] = [];
+          stream.on('error', reject);
+          stream.on('data', (data: Buffer) => {
+            buffers.push(data);
+          });
+          stream.on('end', () => {
+            resolve(Buffer.concat(buffers));
+          });
+        });
+        form.append(i.toString(), fileData, {
+          contentType,
+          filename,
+          knownLength: fileData.length,
+        });
+      },
+    ),
+  );
 
 export default class FileUploadDataSource extends RemoteGraphQLDataSource {
   private static extractFileVariables(
@@ -66,6 +132,16 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
     return extract(rootVariables);
   }
 
+  private addDataHandler: AddDataHandler;
+
+  constructor(config?: FileUploadDataSourceArgs) {
+    super(config);
+    const useChunkedTransfer = config?.useChunkedTransfer ?? true;
+    this.addDataHandler = useChunkedTransfer
+      ? addChunkedDataToForm
+      : addDataToForm;
+  }
+
   async process(args: DataSourceArgs): Promise<GraphQLResponse> {
     const fileVariables = FileUploadDataSource.extractFileVariables(
       args.request.variables,
@@ -112,22 +188,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
 
     // This must come before the file contents append bellow
     form.append('map', JSON.stringify(fileMap));
-
-    resolvedFiles.forEach(
-      ({ createReadStream, filename, mimetype: contentType }, i: number) => {
-        form.append(i.toString(), createReadStream(), {
-          contentType,
-          filename,
-          /*
-              Set knownLength to NaN so node-fetch does not set the
-              Content-Length header and properly set the enconding
-              to chunked.
-              https://github.com/form-data/form-data/pull/397#issuecomment-471976669
-          */
-          knownLength: Number.NaN,
-        });
-      },
-    );
+    await this.addDataHandler(form, resolvedFiles);
 
     const headers = (request.http && request.http.headers) || new Headers();
 

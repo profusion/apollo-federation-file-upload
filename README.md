@@ -6,6 +6,15 @@ It works by simple redirecting the file uploaded stream to the micro-service.
 This package do not use third-party services to send the package to your
 micro-services.
 
+## Using HTTP Transfer-Encoding: chunked
+
+By default the FileUploadDataSource will use chunked transfers and we
+advice that you do not change this setup. However, for some reason
+you can't support this kind of transfer one can provide the `useChunkedTransfer`
+option to the `FileUploadDataSource` constructor as `false` to do not
+use chunked transfer (See the example below on how to set this property).
+Be advised once again, that this can lead to DDOS attacks.
+
 ## Example
 
 On your Gateway you must add the FileUploadDataSource in order
@@ -21,7 +30,7 @@ const runServer = async () => {
   const server = new ApolloServer({
     gateway: new ApolloGateway({
       // Add this line in order to support file uploads.
-      buildService: ({ url }) => new FileUploadDataSource({ url }),
+      buildService: ({ url }) => new FileUploadDataSource({ url, useChunkedTransfer: true }),
       serviceList: [
         /* The services ... */
       ],
