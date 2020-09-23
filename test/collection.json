@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ed0319d0-4237-491e-bb06-845939f0b211",
+		"_postman_id": "9b948411-19a2-4b57-9460-c92969ebaeae",
 		"name": "collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,7 +11,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "03165713-3dd0-478a-8e05-3396abc4cff6",
+						"id": "aa0e2175-1f7a-47cc-90c3-02b54f17cfed",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -62,12 +62,68 @@
 			"response": []
 		},
 		{
+			"name": "SimpleUpload Chunked",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "148032a2-5928-4450-bb19-641791c99d3b",
+						"exec": [
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.simpleUploadChunked).to.deep.equal({",
+							"        'filename': 'upload1.txt',",
+							"        'mimetype': 'text/plain',",
+							"        'encoding': '7bit',",
+							"        'content': 'upload1\\n',",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{ \"query\": \"mutation SingleUploadChunked($f: Upload!) {simpleUploadChunked(f: $f) {filename,mimetype,encoding,content}}\", \"variables\": {\"f\": null}}",
+							"type": "text"
+						},
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.f\"]}",
+							"type": "text"
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload1.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "InputUpload",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "0c5c948e-e67d-4ada-95b5-d5da27322dc3",
+						"id": "47c034a5-9973-414e-8bc8-7b91e2f3db4c",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -118,12 +174,68 @@
 			"response": []
 		},
 		{
+			"name": "InputUpload Chunked",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "08b04874-f00c-4b27-86e3-a2feb97dfc4d",
+						"exec": [
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.simpleInputChunked).to.deep.equal({",
+							"        'filename': 'upload2.txt',",
+							"        'mimetype': 'text/plain',",
+							"        'encoding': '7bit',",
+							"        'content': 'upload2\\n',",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{\"query\": \"mutation SimpleInputMutationChunked($input: SimpleInputChunked!) {simpleInputChunked(input: $input) {filename,mimetype,encoding,content}}\", \"variables\": {\"input\": {\"str\": \"a string\", \"f\": null}}}",
+							"type": "text"
+						},
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.input.f\"]}",
+							"type": "text"
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload2.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "NestedInputUpload",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "3c3778d6-a4b6-4fd1-bba8-0a97a194fea3",
+						"id": "e49f9464-3e7d-4b9c-8c89-d6b8cf35b7fe",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -174,24 +286,80 @@
 			"response": []
 		},
 		{
+			"name": "NestedInputUpload Chunked",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0517bb1a-2ea6-4750-a7c3-d1b3140f1bb4",
+						"exec": [
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.nestedInputChunked).to.deep.equal({",
+							"        'filename': 'upload3.txt',",
+							"        'mimetype': 'text/plain',",
+							"        'encoding': '7bit',",
+							"        'content': 'upload3\\n',",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{\"query\": \"mutation NestedInputMutationChunked($input: NestedInputChunked!) {nestedInputChunked(input: $input) {filename,mimetype,encoding,content}}\", \"variables\": {\"input\": {\"str\": \"a string\", \"nested\": {\"str\": \"another str\", \"f\": null}}}}",
+							"type": "text"
+						},
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.input.nested.f\"]}",
+							"type": "text"
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload3.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "SimpleUploadArray",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "885e52a7-6ec2-442a-b4ce-c0d954871519",
+						"id": "9fad6065-60d2-4d73-af43-4e7482cfacc8",
 						"exec": [
 							"pm.test('results', function() {",
-              "    var resp = pm.response.json();",
-              "    pm.expect(resp.data.simpleUploadArray.length).to.equal(3)",
-              "    resp.data.simpleUploadArray.forEach(function(e, idx) {",
-              "       pm.expect(e).to.deep.equal({",
-              "           'filename': 'upload' + (idx + 1) + '.txt',",
-              "           'mimetype': 'text/plain',",
-              "           'encoding': '7bit',",
-              "           'content': 'upload' + (idx + 1) + '\\n',",
-              "       });",
-              "    });",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.simpleUploadArray.length).to.equal(3)",
+							"    resp.data.simpleUploadArray.forEach(function(e, idx) {",
+							"       pm.expect(e).to.deep.equal({",
+							"           'filename': 'upload' + (idx + 1) + '.txt',",
+							"           'mimetype': 'text/plain',",
+							"           'encoding': '7bit',",
+							"           'content': 'upload' + (idx + 1) + '\\n',",
+							"       });",
+							"    });",
 							"});"
 						],
 						"type": "text/javascript"
@@ -213,13 +381,82 @@
 							"key": "map",
 							"value": "{\"0\": [\"variables.arr.0\"], \"1\": [\"variables.arr.1\"], \"2\": [\"variables.arr.2\"]}",
 							"type": "text"
-            },
-            {
-              "key": "0",
-              "type": "file",
-              "src": "./test/upload1.txt"
-            },
-            {
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload1.txt"
+						},
+						{
+							"key": "1",
+							"type": "file",
+							"src": "./test/upload2.txt"
+						},
+						{
+							"key": "2",
+							"type": "file",
+							"src": "./test/upload3.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SimpleUploadArray Chunked",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57ac5b85-6b89-4984-875d-c92ec1998771",
+						"exec": [
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.simpleUploadArrayChunked.length).to.equal(3)",
+							"    resp.data.simpleUploadArrayChunked.forEach(function(e, idx) {",
+							"       pm.expect(e).to.deep.equal({",
+							"           'filename': 'upload' + (idx + 1) + '.txt',",
+							"           'mimetype': 'text/plain',",
+							"           'encoding': '7bit',",
+							"           'content': 'upload' + (idx + 1) + '\\n',",
+							"       });",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{\"query\": \"mutation SimpleUploadArrayChunked($arr: [Upload!]!, $arr2: [Int!]!) {simpleUploadArrayChunked(arr: $arr, arr2: $arr2) {filename,mimetype,encoding,content}}\", \"variables\": {\"arr\": [], \"arr2\": [1,2,3,4]}}",
+							"type": "text"
+						},
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.arr.0\"], \"1\": [\"variables.arr.1\"], \"2\": [\"variables.arr.2\"]}",
+							"type": "text"
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload1.txt"
+						},
+						{
 							"key": "1",
 							"type": "file",
 							"src": "./test/upload2.txt"
@@ -248,20 +485,20 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8ed6bfe9-323f-40bf-a90f-35b3c90dcfef",
+						"id": "096ee958-fb56-4448-b5ba-e3c71686ac1e",
 						"exec": [
-              "pm.test('results', function() {",
-              "    var resp = pm.response.json();",
-              "    pm.expect(resp.data.inputWithUploadArray.length).to.equal(4)",
-              "    resp.data.inputWithUploadArray.forEach(function(e, idx) {",
-              "       pm.expect(e).to.deep.equal({",
-              "           'filename': 'upload' + (idx + 1) + '.txt',",
-              "           'mimetype': 'text/plain',",
-              "           'encoding': '7bit',",
-              "           'content': 'upload' + (idx + 1) + '\\n',",
-              "       });",
-              "    });",
-              "});"
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.inputWithUploadArray.length).to.equal(4)",
+							"    resp.data.inputWithUploadArray.forEach(function(e, idx) {",
+							"       pm.expect(e).to.deep.equal({",
+							"           'filename': 'upload' + (idx + 1) + '.txt',",
+							"           'mimetype': 'text/plain',",
+							"           'encoding': '7bit',",
+							"           'content': 'upload' + (idx + 1) + '\\n',",
+							"       });",
+							"    });",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -278,31 +515,105 @@
 							"value": "{\"query\": \"mutation InputWithUploadArray($input: InputWithUploadArray!, $input2: [NestedInput!]!) {inputWithUploadArray(input: $input, input2: $input2) {filename,mimetype,encoding,content}}\", \"variables\": {\"input2\": [{\"str\": \"str\", \"nested\": {\"str\": \"nested str\"}}], \"input\": {\"str\": \"a string\"}}}",
 							"type": "text"
 						},
-            {
-              "key": "map",
-              "value": "{\"0\": [\"variables.input.files.0\"], \"1\": [\"variables.input.files.1\"], \"2\": [\"variables.input.files.2\"], \"3\": [\"variables.input2.0.nested.f\"]}",
-              "type": "text"
-            },
-            {
-              "key": "0",
-              "type": "file",
-              "src": "./test/upload1.txt"
-            },
-            {
-              "key": "1",
-              "type": "file",
-              "src": "./test/upload2.txt"
-            },
-            {
-              "key": "2",
-              "type": "file",
-              "src": "./test/upload3.txt"
-            },
-            {
-              "key": "3",
-              "type": "file",
-              "src": "./test/upload4.txt"
-            }
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.input.files.0\"], \"1\": [\"variables.input.files.1\"], \"2\": [\"variables.input.files.2\"], \"3\": [\"variables.input2.0.nested.f\"]}",
+							"type": "text"
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload1.txt"
+						},
+						{
+							"key": "1",
+							"type": "file",
+							"src": "./test/upload2.txt"
+						},
+						{
+							"key": "2",
+							"type": "file",
+							"src": "./test/upload3.txt"
+						},
+						{
+							"key": "3",
+							"type": "file",
+							"src": "./test/upload4.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "InputWithUploadArray Chunked",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "89a3f575-0988-4940-b0f0-09e7b5e8320e",
+						"exec": [
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data.inputWithUploadArrayChunked.length).to.equal(4)",
+							"    resp.data.inputWithUploadArrayChunked.forEach(function(e, idx) {",
+							"       pm.expect(e).to.deep.equal({",
+							"           'filename': 'upload' + (idx + 1) + '.txt',",
+							"           'mimetype': 'text/plain',",
+							"           'encoding': '7bit',",
+							"           'content': 'upload' + (idx + 1) + '\\n',",
+							"       });",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{\"query\": \"mutation InputWithUploadArrayChunked($input: InputWithUploadArrayChunked!, $input2: [NestedInputChunked!]!) {inputWithUploadArrayChunked(input: $input, input2: $input2) {filename,mimetype,encoding,content}}\", \"variables\": {\"input2\": [{\"str\": \"str\", \"nested\": {\"str\": \"nested str\"}}], \"input\": {\"str\": \"a string\"}}}",
+							"type": "text"
+						},
+						{
+							"key": "map",
+							"value": "{\"0\": [\"variables.input.files.0\"], \"1\": [\"variables.input.files.1\"], \"2\": [\"variables.input.files.2\"], \"3\": [\"variables.input2.0.nested.f\"]}",
+							"type": "text"
+						},
+						{
+							"key": "0",
+							"type": "file",
+							"src": "./test/upload1.txt"
+						},
+						{
+							"key": "1",
+							"type": "file",
+							"src": "./test/upload2.txt"
+						},
+						{
+							"key": "2",
+							"type": "file",
+							"src": "./test/upload3.txt"
+						},
+						{
+							"key": "3",
+							"type": "file",
+							"src": "./test/upload4.txt"
+						}
 					]
 				},
 				"url": {
@@ -321,7 +632,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "215009de-1ecb-4074-a5ae-ec64c509f97e",
+				"id": "ae4a24b1-723d-4652-a4a6-cf0973feb966",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -331,7 +642,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "5232172b-5acf-48ef-993a-850b2bf10deb",
+				"id": "b972c0d8-d98d-4811-8743-275a405d3999",
 				"type": "text/javascript",
 				"exec": [
 					""
