@@ -12,7 +12,11 @@ const {
 const gateway = async (): Promise<[ApolloServer, ApolloGateway]> => {
   const apolloGateway = new ApolloGateway({
     buildService: ({ url }): FileUploadDataSource =>
-      new FileUploadDataSource({ url }),
+      new FileUploadDataSource({
+        url,
+        useChunkedTransfer:
+          url?.includes(CHUNKED_DOWNLOAD_SERVICE_PORT) ?? true,
+      }),
     serviceList: [
       {
         name: 'chunked-download',
