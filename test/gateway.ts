@@ -3,13 +3,21 @@ import { ApolloGateway } from '@apollo/gateway';
 
 import FileUploadDataSource from '../lib';
 
-const { DOWNLOAD_SERVICE_PORT = '4001', GATEWAY_PORT = '4000' } = process.env;
+const {
+  CHUNKED_DOWNLOAD_SERVICE_PORT = '4002',
+  DOWNLOAD_SERVICE_PORT = '4001',
+  GATEWAY_PORT = '4000',
+} = process.env;
 
 const gateway = async (): Promise<[ApolloServer, ApolloGateway]> => {
   const apolloGateway = new ApolloGateway({
     buildService: ({ url }): FileUploadDataSource =>
       new FileUploadDataSource({ url }),
     serviceList: [
+      {
+        name: 'chunked-download',
+        url: `http://localhost:${CHUNKED_DOWNLOAD_SERVICE_PORT}/graphql`,
+      },
       {
         name: 'download',
         url: `http://localhost:${DOWNLOAD_SERVICE_PORT}/graphql`,

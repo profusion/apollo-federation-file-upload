@@ -3,6 +3,7 @@ import newman, { NewmanRunSummary } from 'newman';
 
 import StartGateway from './gateway';
 import StartDownloadService from './download-service';
+import StartChunkedDownloadService from './chunked-download-service';
 
 // eslint-disable-next-line import/extensions
 import collection from './collection.json';
@@ -48,6 +49,7 @@ const runTests = (): Promise<void> =>
   });
 
 const start = async (): Promise<void> => {
+  const chunkedDownload = await StartChunkedDownloadService();
   const download = await StartDownloadService();
   const [gatewayServer, gateway] = await StartGateway();
   for (let i = 0; i < maxRetries; i += 1) {
@@ -59,7 +61,11 @@ const start = async (): Promise<void> => {
     } catch (err) {}
   }
   await runTests();
-  await Promise.all([download.stop(), gatewayServer.stop()]);
+  await Promise.all([
+    download.stop(),
+    chunkedDownload.stop(),
+    gatewayServer.stop(),
+  ]);
 };
 
 start().catch(error => {
