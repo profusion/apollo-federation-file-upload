@@ -1,9 +1,10 @@
 {
   "name": "@profusion/apollo-federation-upload",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "author": "Guilherme Iscaro (iscaro@profusion.mobi)",
+  "repository": "https://github.com/profusion/apollo-federation-file-upload",
   "license": "MIT",
   "private": false,
   "scripts": {
