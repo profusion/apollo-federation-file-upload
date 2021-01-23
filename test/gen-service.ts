@@ -2,6 +2,7 @@ import { ApolloServer, gql } from 'apollo-server';
 import { buildFederatedSchema } from '@apollo/federation';
 import { FileUpload } from 'graphql-upload';
 import { GraphQLResolverMap } from 'apollo-graphql';
+import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 
 interface File {
   content: string;
@@ -115,6 +116,7 @@ const genService = (
   };
   return async (): Promise<ApolloServer> => {
     const server = new ApolloServer({
+      plugins: [ApolloServerPluginInlineTraceDisabled()],
       schema: buildFederatedSchema([
         {
           resolvers,

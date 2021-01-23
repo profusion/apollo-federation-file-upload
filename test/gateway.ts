@@ -1,5 +1,6 @@
 import { ApolloServer } from 'apollo-server';
 import { ApolloGateway } from '@apollo/gateway';
+import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 
 import FileUploadDataSource from '../lib';
 
@@ -29,8 +30,8 @@ const gateway = async (): Promise<[ApolloServer, ApolloGateway]> => {
     ],
   });
   const server = new ApolloServer({
-    engine: false,
     gateway: apolloGateway,
+    plugins: [ApolloServerPluginInlineTraceDisabled()],
     subscriptions: false,
   });
 
