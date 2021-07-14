@@ -1,7 +1,7 @@
 import { RemoteGraphQLDataSource } from '@apollo/gateway';
 import { GraphQLResponse, GraphQLRequestContext } from 'apollo-server-types';
+import { FileUpload, Upload } from 'graphql-upload';
 import { Request, Headers, Response } from 'apollo-server-env';
-import { FileUpload } from 'graphql-upload';
 import { isObject } from '@apollo/gateway/dist/utilities/predicates';
 import cloneDeep from 'lodash.clonedeep';
 import set from 'lodash.set';
@@ -95,18 +95,24 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
         (acc: FileVariablesTuple[], [name, value]): FileVariablesTuple[] => {
           const p = prefix ? `${prefix}.` : '';
           const key = `${p}${name}`;
-          if (value instanceof Promise) {
-            acc.push([key, value]);
+          if (value instanceof Promise || value instanceof Upload) {
+            acc.push([
+              key,
+              value instanceof Upload ? (value as Upload).promise : value,
+            ]);
             return acc;
           }
           if (Array.isArray(value)) {
             const [first] = value;
-            if (first instanceof Promise) {
+            if (first instanceof Promise || first instanceof Upload) {
               return acc.concat(
                 value.map(
-                  (v: Promise<FileUpload>, idx: number): FileVariablesTuple => [
+                  (
+                    v: Promise<FileUpload> | Upload,
+                    idx: number,
+                  ): FileVariablesTuple => [
                     `${key}.${idx}`,
-                    v,
+                    v instanceof Upload ? v.promise : v,
                   ],
                 ),
               );
