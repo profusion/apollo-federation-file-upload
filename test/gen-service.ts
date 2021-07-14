@@ -1,8 +1,14 @@
-import { ApolloServer, gql } from 'apollo-server';
+import { ApolloServer, gql } from 'apollo-server-express';
 import { buildFederatedSchema } from '@apollo/federation';
-import { FileUpload } from 'graphql-upload';
+import {
+  FileUpload,
+  graphqlUploadExpress,
+  GraphQLUpload,
+} from 'graphql-upload';
 import { GraphQLResolverMap } from 'apollo-graphql';
 import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
+import express from 'express';
+import http from 'http';
 
 interface File {
   content: string;
@@ -33,7 +39,7 @@ const processUpload = async (f: Promise<FileUpload>): Promise<File> => {
 const genService = (
   port: string | number,
   serviceSuffix = '',
-): (() => Promise<ApolloServer>) => {
+): (() => Promise<[ApolloServer, () => Promise<void>]>) => {
   const typeDefs = gql`
     scalar Upload
 
@@ -113,8 +119,14 @@ const genService = (
       // This is needed, so the gateway won't complain that a Query is missing
       [`dummy${serviceSuffix}`]: (): boolean => true,
     },
+    // GraphQLResolverMap type is weird...
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    Upload: GraphQLUpload,
   };
-  return async (): Promise<ApolloServer> => {
+  return async (): Promise<[ApolloServer, () => Promise<void>]> => {
+    const app = express();
+    app.use(graphqlUploadExpress());
     const server = new ApolloServer({
       plugins: [ApolloServerPluginInlineTraceDisabled()],
       schema: buildFederatedSchema([
@@ -124,12 +136,26 @@ const genService = (
         },
       ]),
       subscriptions: false,
+      uploads: false,
     });
+    server.applyMiddleware({ app });
 
-    const { url } = await server.listen({ port });
+    const expressServer = await new Promise<http.Server>(resolve => {
+      const s = app.listen(
+        typeof port === 'string' ? parseInt(port, 10) : port,
+        'localhost',
+        () => resolve(s),
+      );
+    });
     // eslint-disable-next-line no-console
-    console.log(`🚀  Server ready at ${url}`);
-    return server;
+    console.log(`🚀  Server ready at http://localhost:${port}`);
+    return [
+      server,
+      async (): Promise<void> => {
+        await server.stop();
+        expressServer.close();
+      },
+    ];
   };
 };
 

@@ -1,6 +1,9 @@
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express';
 import { ApolloGateway } from '@apollo/gateway';
 import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
+import express from 'express';
+import { graphqlUploadExpress } from 'graphql-upload';
+import http from 'http';
 
 import FileUploadDataSource from '../lib';
 
@@ -10,7 +13,9 @@ const {
   GATEWAY_PORT = '4000',
 } = process.env;
 
-const gateway = async (): Promise<[ApolloServer, ApolloGateway]> => {
+const gateway = async (): Promise<
+  [ApolloServer, ApolloGateway, () => Promise<void>]
+> => {
   const apolloGateway = new ApolloGateway({
     buildService: ({ url }): FileUploadDataSource =>
       new FileUploadDataSource({
@@ -29,16 +34,31 @@ const gateway = async (): Promise<[ApolloServer, ApolloGateway]> => {
       },
     ],
   });
+  const app = express();
+  app.use(graphqlUploadExpress());
   const server = new ApolloServer({
     gateway: apolloGateway,
     plugins: [ApolloServerPluginInlineTraceDisabled()],
     subscriptions: false,
+    uploads: false,
   });
+  server.applyMiddleware({ app, path: '/' });
 
-  const { url } = await server.listen({ port: GATEWAY_PORT });
+  const expressServer = await new Promise<http.Server>(resolve => {
+    const s = app.listen(parseInt(GATEWAY_PORT, 10), 'localhost', () =>
+      resolve(s),
+    );
+  });
   // eslint-disable-next-line no-console
-  console.log(`🚀  Server ready at ${url}`);
-  return [server, apolloGateway];
+  console.log(`🚀  Server ready at http://localhost:${GATEWAY_PORT}`);
+  return [
+    server,
+    apolloGateway,
+    async (): Promise<void> => {
+      await server.stop();
+      expressServer.close();
+    },
+  ];
 };
 
 export default gateway;

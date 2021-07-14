@@ -49,9 +49,9 @@ const runTests = (): Promise<void> =>
   });
 
 const start = async (): Promise<void> => {
-  const chunkedDownload = await StartChunkedDownloadService();
-  const download = await StartDownloadService();
-  const [gatewayServer, gateway] = await StartGateway();
+  const [, chunkedDownloadDownload] = await StartChunkedDownloadService();
+  const [, stopDownload] = await StartDownloadService();
+  const [, gateway, gatewayServerStop] = await StartGateway();
   for (let i = 0; i < maxRetries; i += 1) {
     try {
       await sleep(100);
@@ -62,9 +62,9 @@ const start = async (): Promise<void> => {
   }
   await runTests();
   await Promise.all([
-    download.stop(),
-    chunkedDownload.stop(),
-    gatewayServer.stop(),
+    stopDownload(),
+    chunkedDownloadDownload(),
+    gatewayServerStop(),
   ]);
 };
 
