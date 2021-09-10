@@ -135,9 +135,8 @@ const genService = (
           typeDefs,
         },
       ]),
-      subscriptions: false,
-      uploads: false,
     });
+    await server.start();
     server.applyMiddleware({ app });
 
     const expressServer = await new Promise<http.Server>(resolve => {

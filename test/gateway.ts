@@ -39,9 +39,8 @@ const gateway = async (): Promise<
   const server = new ApolloServer({
     gateway: apolloGateway,
     plugins: [ApolloServerPluginInlineTraceDisabled()],
-    subscriptions: false,
-    uploads: false,
   });
+  await server.start();
   server.applyMiddleware({ app, path: '/' });
 
   const expressServer = await new Promise<http.Server>(resolve => {

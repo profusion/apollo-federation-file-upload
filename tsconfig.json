@@ -19,7 +19,8 @@
     "strictPropertyInitialization": false,
     "declaration": true,
     "baseUrl": ".",
-    "outDir": "./build"
+    "outDir": "./build",
+    "skipLibCheck": true
   },
   "include": [
     "lib",
