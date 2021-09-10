@@ -1,5 +1,8 @@
-import { RemoteGraphQLDataSource } from '@apollo/gateway';
-import { GraphQLResponse, GraphQLRequestContext } from 'apollo-server-types';
+import {
+  GraphQLDataSourceProcessOptions,
+  RemoteGraphQLDataSource,
+} from '@apollo/gateway';
+import { GraphQLResponse } from 'apollo-server-types';
 import { FileUpload, Upload } from 'graphql-upload';
 import { Request, Headers, Response } from 'apollo-server-env';
 import { isObject } from '@apollo/gateway/dist/utilities/predicates';
@@ -20,11 +23,6 @@ type ConstructorArgs = Exclude<
 export type FileUploadDataSourceArgs = ConstructorArgs & {
   useChunkedTransfer?: boolean;
 };
-
-interface DataSourceArgs {
-  request: GraphQLRequestContext['request'];
-  context: GraphQLRequestContext['context'];
-}
 
 type AddDataHandler = (
   form: FormData,
@@ -148,7 +146,9 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
       : addDataToForm;
   }
 
-  async process(args: DataSourceArgs): Promise<GraphQLResponse> {
+  async process(
+    args: GraphQLDataSourceProcessOptions,
+  ): Promise<GraphQLResponse> {
     const fileVariables = FileUploadDataSource.extractFileVariables(
       args.request.variables,
     );
@@ -159,7 +159,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
   }
 
   private async processFiles(
-    args: DataSourceArgs,
+    args: GraphQLDataSourceProcessOptions,
     fileVariables: FileVariablesTuple[],
   ): Promise<GraphQLResponse> {
     const { context, request } = args;
@@ -215,7 +215,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
     const options = {
       ...request.http,
       // Apollo types are not up-to-date, make TS happy
-      body: (form as unknown) as string,
+      body: form as unknown as string,
     };
 
     const httpRequest = new Request(request.http.url, options);
@@ -240,7 +240,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
 
       return response;
     } catch (error) {
-      this.didEncounterError(error, httpRequest, httpResponse);
+      this.didEncounterError(error as Error, httpRequest, httpResponse);
       throw error;
     }
   }
