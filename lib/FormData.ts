@@ -11,7 +11,7 @@ export default class FormData extends BaseFormData {
       if (err || !Number.isNaN(length)) {
         callback(err, length);
       } else {
-        callback(null, (null as unknown) as number);
+        callback(null, null as unknown as number);
       }
     };
     super.getLength(cb);
@@ -19,6 +19,6 @@ export default class FormData extends BaseFormData {
 
   getLengthSync(): number {
     const len = super.getLengthSync();
-    return Number.isNaN(len) ? ((null as unknown) as number) : len;
+    return Number.isNaN(len) ? (null as unknown as number) : len;
   }
 }
