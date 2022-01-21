@@ -13,7 +13,9 @@ const { GATEWAY_PORT = '4000', MAX_CONNECT_RETRIES = '5' } = process.env;
 const maxRetries = parseInt(MAX_CONNECT_RETRIES, 10);
 
 const sleep = (milliseconds: number): Promise<void> =>
-  new Promise(resolve => setTimeout(resolve, milliseconds));
+  new Promise(resolve => {
+    setTimeout(resolve, milliseconds);
+  });
 
 const runTests = (): Promise<void> =>
   new Promise((resolve, reject) => {

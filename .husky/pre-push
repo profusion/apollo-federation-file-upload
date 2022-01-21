@@ -1,0 +1,4 @@
+#!/bin/bash
+. "$(dirname "$0")/_/husky.sh"
+
+yarn run lint && yarn run test --coverage

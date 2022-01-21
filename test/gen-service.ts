@@ -1,12 +1,15 @@
 import { ApolloServer, gql } from 'apollo-server-express';
-import { buildFederatedSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/federation';
 import {
   FileUpload,
   graphqlUploadExpress,
   GraphQLUpload,
 } from 'graphql-upload';
 import { GraphQLResolverMap } from 'apollo-graphql';
-import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
+import {
+  ApolloServerPluginInlineTraceDisabled,
+  ApolloServerPluginLandingPageDisabled,
+} from 'apollo-server-core';
 import express from 'express';
 import http from 'http';
 
@@ -128,8 +131,11 @@ const genService = (
     const app = express();
     app.use(graphqlUploadExpress());
     const server = new ApolloServer({
-      plugins: [ApolloServerPluginInlineTraceDisabled()],
-      schema: buildFederatedSchema([
+      plugins: [
+        ApolloServerPluginInlineTraceDisabled(),
+        ApolloServerPluginLandingPageDisabled(),
+      ],
+      schema: buildSubgraphSchema([
         {
           resolvers,
           typeDefs,
@@ -137,7 +143,7 @@ const genService = (
       ]),
     });
     await server.start();
-    server.applyMiddleware({ app });
+    server.applyMiddleware({ app, path: '/graphql' });
 
     const expressServer = await new Promise<http.Server>(resolve => {
       const s = app.listen(
