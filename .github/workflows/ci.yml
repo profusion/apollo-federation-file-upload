@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [16.x, 14.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -36,7 +36,6 @@ jobs:
           ${{ runner.os }}-yarn-
     - run: cp .env.example .env
     - run: yarn --frozen-lockfile
-    - run: yarn install-peers -f
     - run: yarn lint
     - run: yarn build
     - run: yarn test

@@ -1,6 +1,9 @@
 import { ApolloServer } from 'apollo-server-express';
-import { ApolloGateway } from '@apollo/gateway';
-import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
+import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
+import {
+  ApolloServerPluginInlineTraceDisabled,
+  ApolloServerPluginLandingPageDisabled,
+} from 'apollo-server-core';
 import express from 'express';
 import { graphqlUploadExpress } from 'graphql-upload';
 import http from 'http';
@@ -23,22 +26,27 @@ const gateway = async (): Promise<
         useChunkedTransfer:
           url?.includes(CHUNKED_DOWNLOAD_SERVICE_PORT) ?? true,
       }),
-    serviceList: [
-      {
-        name: 'chunked-download',
-        url: `http://localhost:${CHUNKED_DOWNLOAD_SERVICE_PORT}/graphql`,
-      },
-      {
-        name: 'download',
-        url: `http://localhost:${DOWNLOAD_SERVICE_PORT}/graphql`,
-      },
-    ],
+    supergraphSdl: new IntrospectAndCompose({
+      subgraphs: [
+        {
+          name: 'chunked-download',
+          url: `http://localhost:${CHUNKED_DOWNLOAD_SERVICE_PORT}/graphql`,
+        },
+        {
+          name: 'download',
+          url: `http://localhost:${DOWNLOAD_SERVICE_PORT}/graphql`,
+        },
+      ],
+    }),
   });
   const app = express();
   app.use(graphqlUploadExpress());
   const server = new ApolloServer({
     gateway: apolloGateway,
-    plugins: [ApolloServerPluginInlineTraceDisabled()],
+    plugins: [
+      ApolloServerPluginInlineTraceDisabled(),
+      ApolloServerPluginLandingPageDisabled(),
+    ],
   });
   await server.start();
   server.applyMiddleware({ app, path: '/' });

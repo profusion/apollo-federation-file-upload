@@ -222,7 +222,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
     let httpResponse: Response | undefined;
 
     try {
-      httpResponse = await this.fetcher(httpRequest);
+      httpResponse = await this.fetcher(request.http.url, options);
 
       const body = await this.parseBody(httpResponse);
 
