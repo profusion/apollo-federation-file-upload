@@ -1,5 +1,5 @@
 import { ApolloServer, gql } from 'apollo-server-express';
-import { buildSubgraphSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import {
   FileUpload,
   graphqlUploadExpress,
