@@ -7,6 +7,14 @@
   "repository": "https://github.com/profusion/apollo-federation-file-upload",
   "license": "MIT",
   "private": false,
+  "keywords": [
+    "apollo",
+    "federation",
+    "file",
+    "gateway",
+    "graphQL",
+    "upload"
+  ],
   "scripts": {
     "prepare": "husky install",
     "check-types": "tsc --noEmit",
