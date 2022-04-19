@@ -8,6 +8,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
+    "prepare": "husky install",
     "check-types": "tsc --noEmit",
     "run-lint": "eslint --max-warnings=0 --ext .ts lib",
     "lint": "run-s check-types run-lint",
@@ -25,13 +26,6 @@
     "apollo-server-env": "^4.2.1",
     "apollo-server-types": "^3.5.2",
     "graphql-upload": "^13.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint && yarn test --coverage",
-      "pre-push": "yarn lint && yarn test --coverage",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   },
   "devDependencies": {
     "@apollo/gateway": "^2.0.1",
