@@ -6,6 +6,10 @@ It works by simply redirecting the file uploaded stream to the micro-service.
 This package does not use third-party services to send the package to your
 micro-services.
 
+## Apollo Federation V2 Support
+
+Please, use version 4.0.0+. For Federation V1 use 3.0.0 or earlier.
+
 ## Using HTTP Transfer-Encoding: chunked
 
 By default, the `FileUploadDataSource` uses chunked transfers; we
