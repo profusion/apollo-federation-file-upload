@@ -216,6 +216,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
       ...request.http,
       // Apollo types are not up-to-date, make TS happy
       body: form as unknown as string,
+      headers: Object.fromEntries(request.http.headers),
     };
 
     const httpRequest = new Request(request.http.url, options);
