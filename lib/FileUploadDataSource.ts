@@ -4,7 +4,8 @@ import {
 } from '@apollo/gateway';
 import { GraphQLResponse } from 'apollo-server-types';
 import { FileUpload, Upload } from 'graphql-upload';
-import { Request, Headers, Response } from 'apollo-server-env';
+import { Headers, Response } from 'apollo-server-env';
+import { Request } from 'node-fetch';
 import { isObject } from '@apollo/gateway/dist/utilities/predicates';
 import cloneDeep from 'lodash.clonedeep';
 import set from 'lodash.set';

@@ -30,13 +30,14 @@
     "lodash.set": "^4.3.2"
   },
   "peerDependencies": {
-    "@apollo/gateway": "^2.0.1",
+    "@apollo/gateway": "^2.0.4",
     "apollo-server-env": "^4.2.1",
     "apollo-server-types": "^3.5.2",
-    "graphql-upload": "^13.0.0"
+    "graphql-upload": "^13.0.0",
+    "node-fetch": "^3.2.5"
   },
   "devDependencies": {
-    "@apollo/gateway": "^2.0.1",
+    "@apollo/gateway": "^2.0.4",
     "@apollo/subgraph": "^2.0.4",
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-angular": "^17.0.0",
