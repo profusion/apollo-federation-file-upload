@@ -3,7 +3,10 @@ import {
   RemoteGraphQLDataSource,
 } from '@apollo/gateway';
 import { GraphQLResponse } from 'apollo-server-types';
-import { FileUpload, Upload } from 'graphql-upload';
+// eslint-disable-next-line import/extensions
+import Upload from 'graphql-upload/Upload.js';
+// eslint-disable-next-line import/extensions
+import type { FileUpload } from 'graphql-upload/GraphQLUpload.js';
 import { Headers, Response } from 'apollo-server-env';
 import { Request } from 'node-fetch';
 import { isObject } from '@apollo/gateway/dist/utilities/predicates';

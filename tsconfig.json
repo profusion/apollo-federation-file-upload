@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2015",
     "moduleResolution": "node",
-    "module": "CommonJS",
+    "module": "nodenext",
     "lib": ["es2017", "es7", "es6"],
     "allowJs": true,
     "strict": true,
@@ -20,7 +20,8 @@
     "declaration": true,
     "baseUrl": ".",
     "outDir": "./build",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "maxNodeModuleJsDepth": 10
   },
   "include": [
     "lib",
