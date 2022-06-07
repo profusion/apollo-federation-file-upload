@@ -5,7 +5,9 @@ import {
   ApolloServerPluginLandingPageDisabled,
 } from 'apollo-server-core';
 import express from 'express';
-import { graphqlUploadExpress } from 'graphql-upload';
+
+// eslint-disable-next-line import/extensions
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import http from 'http';
 import type { AddressInfo } from 'net';
 
