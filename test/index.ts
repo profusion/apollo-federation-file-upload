@@ -8,16 +8,14 @@ import StartChunkedDownloadService from './chunked-download-service';
 // eslint-disable-next-line import/extensions
 import collection from './collection.json';
 
-const { GATEWAY_PORT = '4000', MAX_CONNECT_RETRIES = '5' } = process.env;
-
-const maxRetries = parseInt(MAX_CONNECT_RETRIES, 10);
+const maxRetries = 5;
 
 const sleep = (milliseconds: number): Promise<void> =>
   new Promise(resolve => {
     setTimeout(resolve, milliseconds);
   });
 
-const runTests = (): Promise<void> =>
+const runTests = (gatewayPort: number): Promise<void> =>
   new Promise((resolve, reject) => {
     newman.run(
       {
@@ -29,7 +27,7 @@ const runTests = (): Promise<void> =>
             {
               key: 'PORT',
               type: 'text',
-              value: GATEWAY_PORT,
+              value: gatewayPort,
             },
           ],
         },
@@ -51,22 +49,25 @@ const runTests = (): Promise<void> =>
   });
 
 const start = async (): Promise<void> => {
-  const [, chunkedDownloadDownload] = await StartChunkedDownloadService();
-  const [, stopDownload] = await StartDownloadService();
-  const [, gateway, gatewayServerStop] = await StartGateway();
+  const chunkedService = await StartChunkedDownloadService();
+  const downloadService = await StartDownloadService();
+  const gatewayService = await StartGateway({
+    chunkedAddress: chunkedService.address,
+    downloadAddress: downloadService.address,
+  });
   for (let i = 0; i < maxRetries; i += 1) {
     try {
       await sleep(100);
       // wait until the gateway has loaded the service definitions
-      await gateway.serviceHealthCheck();
+      await gatewayService.gateway.serviceHealthCheck();
       // eslint-disable-next-line no-empty
     } catch (err) {}
   }
-  await runTests();
+  await runTests(gatewayService.address.port);
   await Promise.all([
-    stopDownload(),
-    chunkedDownloadDownload(),
-    gatewayServerStop(),
+    chunkedService.cleanup(),
+    downloadService.cleanup(),
+    gatewayService.cleanup(),
   ]);
 };
 

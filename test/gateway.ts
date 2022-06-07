@@ -7,34 +7,38 @@ import {
 import express from 'express';
 import { graphqlUploadExpress } from 'graphql-upload';
 import http from 'http';
+import type { AddressInfo } from 'net';
 
 import FileUploadDataSource from '../lib';
+import { ServiceDescription } from './gen-service';
 
-const {
-  CHUNKED_DOWNLOAD_SERVICE_PORT = '4002',
-  DOWNLOAD_SERVICE_PORT = '4001',
-  GATEWAY_PORT = '4000',
-} = process.env;
+export type GatewayDescription = ServiceDescription & {
+  gateway: ApolloGateway;
+};
 
-const gateway = async (): Promise<
-  [ApolloServer, ApolloGateway, () => Promise<void>]
-> => {
+const gateway = async ({
+  chunkedAddress,
+  downloadAddress,
+}: {
+  chunkedAddress: AddressInfo;
+  downloadAddress: AddressInfo;
+}): Promise<GatewayDescription> => {
   const apolloGateway = new ApolloGateway({
     buildService: ({ url }): FileUploadDataSource =>
       new FileUploadDataSource({
         url,
         useChunkedTransfer:
-          url?.includes(CHUNKED_DOWNLOAD_SERVICE_PORT) ?? true,
+          url?.includes(chunkedAddress.port.toString()) ?? true,
       }),
     supergraphSdl: new IntrospectAndCompose({
       subgraphs: [
         {
           name: 'chunked-download',
-          url: `http://localhost:${CHUNKED_DOWNLOAD_SERVICE_PORT}/graphql`,
+          url: `http://${chunkedAddress.address}:${chunkedAddress.port}/graphql`,
         },
         {
           name: 'download',
-          url: `http://localhost:${DOWNLOAD_SERVICE_PORT}/graphql`,
+          url: `http://${downloadAddress.address}:${downloadAddress.port}/graphql`,
         },
       ],
     }),
@@ -52,20 +56,18 @@ const gateway = async (): Promise<
   server.applyMiddleware({ app, path: '/' });
 
   const expressServer = await new Promise<http.Server>(resolve => {
-    const s = app.listen(parseInt(GATEWAY_PORT, 10), 'localhost', () =>
-      resolve(s),
-    );
+    const s = app.listen(0, 'localhost', () => resolve(s));
   });
-  // eslint-disable-next-line no-console
-  console.log(`🚀  Server ready at http://localhost:${GATEWAY_PORT}`);
-  return [
-    server,
-    apolloGateway,
-    async (): Promise<void> => {
+  const address = expressServer.address() as AddressInfo;
+  return {
+    address,
+    cleanup: async (): Promise<void> => {
       await server.stop();
       expressServer.close();
     },
-  ];
+    gateway: apolloGateway,
+    server,
+  };
 };
 
 export default gateway;
