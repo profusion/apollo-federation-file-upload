@@ -12,6 +12,7 @@ import {
 } from 'apollo-server-core';
 import express from 'express';
 import http from 'http';
+import type { AddressInfo } from 'net';
 
 interface File {
   content: string;
@@ -39,10 +40,15 @@ const processUpload = async (f: Promise<FileUpload>): Promise<File> => {
   };
 };
 
+export type ServiceDescription = {
+  address: AddressInfo;
+  cleanup: () => Promise<void>;
+  server: ApolloServer;
+};
+
 const genService = (
-  port: string | number,
   serviceSuffix = '',
-): (() => Promise<[ApolloServer, () => Promise<void>]>) => {
+): (() => Promise<ServiceDescription>) => {
   const typeDefs = gql`
     scalar Upload
 
@@ -127,7 +133,7 @@ const genService = (
     // @ts-ignore
     Upload: GraphQLUpload,
   };
-  return async (): Promise<[ApolloServer, () => Promise<void>]> => {
+  return async (): Promise<ServiceDescription> => {
     const app = express();
     app.use(graphqlUploadExpress());
     const server = new ApolloServer({
@@ -146,21 +152,17 @@ const genService = (
     server.applyMiddleware({ app, path: '/graphql' });
 
     const expressServer = await new Promise<http.Server>(resolve => {
-      const s = app.listen(
-        typeof port === 'string' ? parseInt(port, 10) : port,
-        'localhost',
-        () => resolve(s),
-      );
+      const s = app.listen(0, 'localhost', () => resolve(s));
     });
-    // eslint-disable-next-line no-console
-    console.log(`🚀  Server ready at http://localhost:${port}`);
-    return [
-      server,
-      async (): Promise<void> => {
+    const address = expressServer.address() as AddressInfo;
+    return {
+      address,
+      cleanup: async (): Promise<void> => {
         await server.stop();
         expressServer.close();
       },
-    ];
+      server,
+    };
   };
 };
 
