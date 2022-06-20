@@ -31,10 +31,7 @@
     "lodash.set": "^4.3.2"
   },
   "peerDependencies": {
-    "@apollo/gateway": "^2.0.4",
-    "apollo-server-env": "^4.2.1",
-    "apollo-server-types": "^3.5.2",
-    "node-fetch": "^3.2.5"
+    "@apollo/gateway": "^2.0.4"
   },
   "devDependencies": {
     "@apollo/gateway": "^2.0.4",
@@ -44,15 +41,14 @@
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/lodash.clonedeep": "^4.5.7",
     "@types/lodash.set": "^4.3.7",
+    "@types/make-fetch-happen": "^9.0.2",
     "@types/newman": "^5.3.0",
     "@types/node": "^17.0.40",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
     "apollo-graphql": "^0.9.7",
     "apollo-server-core": "^3.8.2",
-    "apollo-server-env": "^4.2.1",
     "apollo-server-express": "^3.8.2",
-    "apollo-server-types": "^3.6.0",
     "eslint": "^8.17.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",

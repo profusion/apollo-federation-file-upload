@@ -1,17 +1,15 @@
 import {
-  GraphQLDataSourceProcessOptions,
+  type GraphQLDataSourceProcessOptions,
   RemoteGraphQLDataSource,
 } from '@apollo/gateway';
-import { GraphQLResponse } from 'apollo-server-types';
 // eslint-disable-next-line import/extensions
 import Upload from 'graphql-upload/Upload.js';
 // eslint-disable-next-line import/extensions
 import type { FileUpload } from 'graphql-upload/GraphQLUpload.js';
-import { Headers, Response } from 'apollo-server-env';
-import { Request } from 'node-fetch';
 import { isObject } from '@apollo/gateway/dist/utilities/predicates';
 import cloneDeep from 'lodash.clonedeep';
 import set from 'lodash.set';
+import type { FetchInterface, FetchOptions } from 'make-fetch-happen';
 
 import FormData from './FormData';
 
@@ -24,7 +22,11 @@ type ConstructorArgs = Exclude<
   undefined
 >;
 
-export type FileUploadDataSourceArgs = ConstructorArgs & {
+type Response = Awaited<ReturnType<FetchInterface>>;
+
+type ProcessResult = ReturnType<RemoteGraphQLDataSource['process']>;
+
+export type FileUploadDataSourceArgs = Omit<ConstructorArgs, 'fetcher'> & {
   useChunkedTransfer?: boolean;
 };
 
@@ -86,6 +88,8 @@ const addDataToForm: AddDataHandler = (
   );
 
 export default class FileUploadDataSource extends RemoteGraphQLDataSource {
+  fetcher: FetchInterface;
+
   private static extractFileVariables(
     rootVariables?: Variables,
   ): FileVariablesTuple[] {
@@ -150,9 +154,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
       : addDataToForm;
   }
 
-  async process(
-    args: GraphQLDataSourceProcessOptions,
-  ): Promise<GraphQLResponse> {
+  async process(args: GraphQLDataSourceProcessOptions): ProcessResult {
     const fileVariables = FileUploadDataSource.extractFileVariables(
       args.request.variables,
     );
@@ -165,7 +167,7 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
   private async processFiles(
     args: GraphQLDataSourceProcessOptions,
     fileVariables: FileVariablesTuple[],
-  ): Promise<GraphQLResponse> {
+  ): ProcessResult {
     const { context, request } = args;
     const form = new FormData();
 
@@ -200,13 +202,14 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
     form.append('map', JSON.stringify(fileMap));
     await this.addDataHandler(form, resolvedFiles);
 
-    const headers = (request.http && request.http.headers) || new Headers();
+    const headers = {
+      ...Object.fromEntries(request?.http?.headers || []),
+      ...form.getHeaders(),
+    };
 
-    Object.entries(form.getHeaders() || {}).forEach(([k, value]) => {
-      headers.set(k, value);
-    });
+    Object.assign(headers, form.getHeaders() || {});
 
-    request.http = {
+    const httpRequest = {
       headers,
       method: 'POST',
       url: this.url,
@@ -217,17 +220,25 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
     }
 
     const options = {
-      ...request.http,
-      // Apollo types are not up-to-date, make TS happy
-      body: form as unknown as string,
-      headers: Object.fromEntries(request.http.headers),
+      ...httpRequest,
+      body: form,
     };
 
-    const httpRequest = new Request(request.http.url, options);
+    // NOTE: there is currently a type mismatch related to Headers in @apollo/gateway and apollo-server-env:
+    //
+    //  >> you should ensure that you pass "plain" objects rather than Headers or Request objects,
+    //  >> as the newer version has slightly different logic about how to recognize Headers and
+    //  >> Request objects.
+    //
+    // see:
+    // - https://github.com/apollographql/federation/pull/1906
+    // - https://github.com/profusion/apollo-federation-file-upload/issues/52#issuecomment-1148946002
+    request.http = httpRequest as Exclude<typeof request.http, undefined>;
+
     let httpResponse: Response | undefined;
 
     try {
-      httpResponse = await this.fetcher(request.http.url, options);
+      httpResponse = await this.fetcher(this.url, options);
 
       const body = await this.parseBody(httpResponse);
 
@@ -245,8 +256,17 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
 
       return response;
     } catch (error) {
-      this.didEncounterError(error as Error, httpRequest, httpResponse);
+      this.didEncounterError(error, options, httpResponse);
       throw error;
     }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public override didEncounterError(
+    error: unknown,
+    _request: FetchOptions,
+    _reponse?: Response,
+  ): never {
+    throw error;
   }
 }
