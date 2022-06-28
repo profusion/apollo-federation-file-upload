@@ -202,6 +202,12 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
     form.append('map', JSON.stringify(fileMap));
     await this.addDataHandler(form, resolvedFiles);
 
+    // This must happen before constructing the request headers
+    // otherwise any custom headers set in willSendRequest are ignored
+    if (this.willSendRequest) {
+      await this.willSendRequest(args);
+    }
+
     const headers = {
       ...Object.fromEntries(request?.http?.headers || []),
       ...form.getHeaders(),
@@ -214,10 +220,6 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
       method: 'POST',
       url: this.url,
     };
-
-    if (this.willSendRequest) {
-      await this.willSendRequest(args);
-    }
 
     const options = {
       ...httpRequest,
