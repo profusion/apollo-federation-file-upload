@@ -49,7 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^5.19.0",
     "@typescript-eslint/parser": "^5.19.0",
     "apollo-graphql": "^0.9.6",
-    "apollo-server-core": "^3.6.7",
+    "apollo-server-core": "^3.10.1",
     "apollo-server-env": "^4.2.1",
     "apollo-server-express": "^3.6.7",
     "apollo-server-types": "^3.5.2",
