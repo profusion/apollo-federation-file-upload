@@ -47,6 +47,10 @@ export type ServiceDescription = {
   server: ApolloServer;
 };
 
+interface TestContext {
+  language: string;
+}
+
 const genService = (
   serviceSuffix = '',
 ): (() => Promise<ServiceDescription>) => {
@@ -88,9 +92,10 @@ const genService = (
 
     extend type Query {
       dummy${serviceSuffix}: Boolean
+      customLanguageHeader${serviceSuffix}: String
     }
   `;
-  const resolvers: GraphQLResolverMap<unknown> = {
+  const resolvers: GraphQLResolverMap<TestContext> = {
     Mutation: {
       [`inputWithUploadArray${serviceSuffix}`]: (
         _: unknown,
@@ -128,6 +133,13 @@ const genService = (
     Query: {
       // This is needed, so the gateway won't complain that a Query is missing
       [`dummy${serviceSuffix}`]: (): boolean => true,
+      [`customLanguageHeader${serviceSuffix}`]: (
+        _,
+        __,
+        contextValue,
+      ): string => {
+        return contextValue.language;
+      },
     },
     // GraphQLResolverMap type is weird...
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -138,6 +150,9 @@ const genService = (
     const app = express();
     app.use(graphqlUploadExpress());
     const server = new ApolloServer({
+      context: async ({ req }) => ({
+        language: req.headers['accept-language'],
+      }),
       plugins: [
         ApolloServerPluginInlineTraceDisabled(),
         ApolloServerPluginLandingPageDisabled(),
