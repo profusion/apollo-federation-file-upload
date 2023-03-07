@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9b948411-19a2-4b57-9460-c92969ebaeae",
+		"_postman_id": "8465fa86-44c4-44fd-bfbc-da78a36b06e7",
 		"name": "collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,7 +11,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "aa0e2175-1f7a-47cc-90c3-02b54f17cfed",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -67,7 +66,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "148032a2-5928-4450-bb19-641791c99d3b",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -123,7 +121,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "47c034a5-9973-414e-8bc8-7b91e2f3db4c",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -179,7 +176,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "08b04874-f00c-4b27-86e3-a2feb97dfc4d",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -235,7 +231,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e49f9464-3e7d-4b9c-8c89-d6b8cf35b7fe",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -291,7 +286,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "0517bb1a-2ea6-4750-a7c3-d1b3140f1bb4",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -347,7 +341,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9fad6065-60d2-4d73-af43-4e7482cfacc8",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -416,7 +409,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "57ac5b85-6b89-4984-875d-c92ec1998771",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -485,7 +477,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "096ee958-fb56-4448-b5ba-e3c71686ac1e",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -559,7 +550,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "89a3f575-0988-4940-b0f0-09e7b5e8320e",
 						"exec": [
 							"pm.test('results', function() {",
 							"    var resp = pm.response.json();",
@@ -626,13 +616,60 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "CustomHeader",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('results', function() {",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.data).to.deep.equal({",
+							"        'customLanguageHeader': 'pt-BR'",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "operations",
+							"value": "{ \"query\": \"query { customLanguageHeader }\" }",
+							"type": "default"
+						},
+						{
+							"key": "map",
+							"value": "{}",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:{{PORT}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{PORT}}"
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "ae4a24b1-723d-4652-a4a6-cf0973feb966",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -642,13 +679,11 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "b972c0d8-d98d-4811-8743-275a405d3999",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }

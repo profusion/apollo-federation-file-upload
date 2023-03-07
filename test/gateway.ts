@@ -1,5 +1,8 @@
 import { ApolloServer } from 'apollo-server-express';
-import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
+import {
+  ApolloGateway,
+  IntrospectAndCompose,
+} from '@apollo/gateway';
 import {
   ApolloServerPluginInlineTraceDisabled,
   ApolloServerPluginLandingPageDisabled,
@@ -11,23 +14,29 @@ import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import http from 'http';
 import type { AddressInfo } from 'net';
 
-import FileUploadDataSource from '../lib';
 import { ServiceDescription } from './gen-service';
+import { FileUploadDataSourceArgs } from '../lib/FileUploadDataSource';
+import DataSourceWithCustomHeaders from './DataSourceWithCustomHeaders';
 
 export type GatewayDescription = ServiceDescription & {
   gateway: ApolloGateway;
 };
 
-const gateway = async ({
-  chunkedAddress,
-  downloadAddress,
-}: {
-  chunkedAddress: AddressInfo;
-  downloadAddress: AddressInfo;
-}): Promise<GatewayDescription> => {
+const gateway = async (
+  DataSource: new (
+    config: FileUploadDataSourceArgs,
+  ) => DataSourceWithCustomHeaders,
+  {
+    chunkedAddress,
+    downloadAddress,
+  }: {
+    chunkedAddress: AddressInfo;
+    downloadAddress: AddressInfo;
+  },
+): Promise<GatewayDescription> => {
   const apolloGateway = new ApolloGateway({
-    buildService: ({ url }): FileUploadDataSource =>
-      new FileUploadDataSource({
+    buildService: ({ url }): DataSourceWithCustomHeaders =>
+      new DataSource({
         url,
         useChunkedTransfer:
           url?.includes(chunkedAddress.port.toString()) ?? true,

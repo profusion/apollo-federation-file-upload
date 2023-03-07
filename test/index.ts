@@ -7,6 +7,7 @@ import StartChunkedDownloadService from './chunked-download-service';
 
 // eslint-disable-next-line import/extensions
 import collection from './collection.json';
+import DataSourceWithCustomHeaders from './DataSourceWithCustomHeaders';
 
 const maxRetries = 5;
 
@@ -51,7 +52,7 @@ const runTests = (gatewayPort: number): Promise<void> =>
 const start = async (): Promise<void> => {
   const chunkedService = await StartChunkedDownloadService();
   const downloadService = await StartDownloadService();
-  const gatewayService = await StartGateway({
+  const gatewayService = await StartGateway(DataSourceWithCustomHeaders, {
     chunkedAddress: chunkedService.address,
     downloadAddress: downloadService.address,
   });
