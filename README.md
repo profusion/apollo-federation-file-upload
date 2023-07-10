@@ -19,6 +19,35 @@ option to the `FileUploadDataSource` constructor as `false` to not
 use chunked transfer (See the example below on setting this property).
 Be advised once again that this can lead to DDOS attacks.
 
+## Preventing CSRF attacks
+
+This package uses `graphql-upload`, if you want to prevent a CSRF attack you should keep
+the CSRF prevention feature enabled, and configure your upload clients to send a non-empty
+`Apollo-Require-Preflight` header.
+
+You can take a look at [Apollo's security guide](https://www.apollographql.com/docs/apollo-server/security/cors/#preventing-cross-site-request-forgery-csrf) for more details.
+
+#### How to enable CRSF Prevention
+
+```javascript
+import { ApolloServer } from 'apollo-server';
+
+const runServer = async () => {
+  const server = new ApolloServer({
+    /*
+     If activated it will request by default a header with ['x-apollo-operation-name', 'apollo-require-preflight']
+
+     You can also change the allowed headers by passing them to csrfPrevention.requestHeaders
+    */
+    csrfPrevention: true,
+    ...
+  });
+...
+};
+
+...
+```
+
 ## Example
 
 On your Gateway, you must add the `FileUploadDataSource` in order
